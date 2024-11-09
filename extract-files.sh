@@ -59,6 +59,13 @@ function blob_fixup {
         vendor/bin/hw/android.hardware.media.c2@1.2-mediatek|vendor/bin/hw/android.hardware.media.c2@1.2-mediatek-64b)
             "${PATCHELF}" --add-needed "libstagefright_foundation-v33.so" "${2}"
             ;;
+        vendor/lib64/mediadrm/libwvdrmengine.so|vendor/lib64/libwvhidl.so)
+            [ "$2" = "" ] && return 0
+            grep -q "libcrypto-v33.so" "${2}" || "${PATCHELF}" --replace-needed "libcrypto.so" "libcrypto-v33.so" "$2"
+            ;;
+        *)
+            return 1
+            ;;
         vendor/bin/mnld|vendor/lib*/libcam.utils.sensorprovider.so|vendor/lib*/libaalservice.so|vendor/lib64/hw/android.hardware.sensors@2.X-subhal-mediatek.so)
             "${PATCHELF}" --replace-needed "libsensorndkbridge.so" "libsensorndkbridge-hidl.so" "$2"
             ;;
@@ -75,9 +82,6 @@ function blob_fixup {
             ;;
         vendor/lib*/hw/vendor.mediatek.hardware.pq@2.13-impl.so|vendor/lib*/libmtkcam_stdutils.so)
             "${PATCHELF}" --replace-needed "libutils.so" "libutils-v32.so" "${2}"
-            ;;
-        vendor/lib/mediadrm/libwvdrmengine.so|vendor/lib/libwvhidl.so)
-            "$PATCHELF" --replace-needed "libcrypto.so" "libcrypto_v33.so" "$2"
             ;;
         vendor/lib*/hw/audio.primary.mediatek.so)
             "${PATCHELF}" --replace-needed "libalsautils.so" "libalsautils-v32.so" "${2}"
